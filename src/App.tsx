@@ -16,6 +16,7 @@ function App() {
   const currentContentRef = useRef('')
   const savedRef = useRef(true)
   const titleRef = useRef('')
+  const [wordWrap, setWordWrap] = useState<'on' | 'off'>('on')
 
   useEffect(() => {
     const initialize = async () => {
@@ -94,6 +95,9 @@ function App() {
         if (e.metaKey && e.key === 's') {
           e.preventDefault()
           handleSave()
+        } else if (e.altKey && e.code === 'KeyZ') {
+          e.preventDefault()
+          setWordWrap((prev) => (prev === 'on' ? 'off' : 'on'))
         }
       }}
     >
@@ -101,7 +105,7 @@ function App() {
         height={'100vh'}
         defaultLanguage='markdown'
         options={{
-          wordWrap: 'on',
+          wordWrap,
         }}
         defaultValue={content}
         onChange={handleChange}
