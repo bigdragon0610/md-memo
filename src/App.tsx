@@ -1,6 +1,6 @@
 import { Editor } from '@monaco-editor/react'
 import './App.css'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   BaseDirectory,
   create,
@@ -9,9 +9,12 @@ import {
   readTextFile,
   writeTextFile,
 } from '@tauri-apps/plugin-fs'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 
 function App() {
   const [content, setContent] = useState('')
+  const currentContentRef = useRef('')
+  const savedRef = useRef(true)
 
   useEffect(() => {
     const readOrCreateFile = async () => {
@@ -39,10 +42,35 @@ function App() {
     readOrCreateFile()
   }, [])
 
-  const saveFile = async () => {
-    await writeTextFile('index.md', content, {
+  const toggleSaveStatus = async (saved: boolean) => {
+    const window = getCurrentWindow()
+    const title = await window.title()
+    if (saved) {
+      await getCurrentWindow().setTitle(title.replace(' *', ''))
+    } else {
+      await getCurrentWindow().setTitle(`${title} *`)
+    }
+    savedRef.current = saved
+  }
+
+  const handleSave = async () => {
+    setContent(currentContentRef.current)
+    await writeTextFile('index.md', currentContentRef.current, {
       baseDir: BaseDirectory.AppLocalData,
     })
+
+    toggleSaveStatus(true)
+  }
+
+  const handleChange = async (value: string | undefined) => {
+    if (value === undefined) return
+    currentContentRef.current = value
+
+    if (value !== content && savedRef.current) {
+      toggleSaveStatus(false)
+    } else if (value === content) {
+      toggleSaveStatus(true)
+    }
   }
 
   return (
@@ -50,7 +78,7 @@ function App() {
       onKeyDown={(e) => {
         if (e.metaKey && e.key === 's') {
           e.preventDefault()
-          saveFile()
+          handleSave()
         }
       }}
     >
@@ -61,7 +89,7 @@ function App() {
           wordWrap: 'on',
         }}
         defaultValue={content}
-        onChange={(value) => setContent(value ?? '')}
+        onChange={handleChange}
       />
     </main>
   )
