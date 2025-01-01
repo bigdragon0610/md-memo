@@ -10,16 +10,20 @@ import {
   writeTextFile,
 } from '@tauri-apps/plugin-fs'
 import { getCurrentWindow } from '@tauri-apps/api/window'
+import { invoke } from '@tauri-apps/api/core'
 
 function App() {
   const [content, setContent] = useState('')
+  const [wordWrap, setWordWrap] = useState<'on' | 'off'>('on')
   const currentContentRef = useRef('')
   const savedRef = useRef(true)
   const titleRef = useRef('')
-  const [wordWrap, setWordWrap] = useState<'on' | 'off'>('on')
+  const fileNameRef = useRef('')
 
   useEffect(() => {
     const initialize = async () => {
+      fileNameRef.current = await invoke('get_file_name')
+
       try {
         const dirExists = await exists('', {
           baseDir: BaseDirectory.AppLocalData,
@@ -30,13 +34,13 @@ function App() {
           })
         }
 
-        const initialContent = await readTextFile('index.md', {
+        const initialContent = await readTextFile(fileNameRef.current, {
           baseDir: BaseDirectory.AppLocalData,
         })
         setContent(initialContent)
       } catch (error) {
         console.error(error)
-        await create('index.md', {
+        await create(fileNameRef.current, {
           baseDir: BaseDirectory.AppLocalData,
         })
       }
@@ -68,7 +72,7 @@ function App() {
   const handleSave = async () => {
     try {
       setContent(currentContentRef.current)
-      await writeTextFile('index.md', currentContentRef.current, {
+      await writeTextFile(fileNameRef.current, currentContentRef.current, {
         baseDir: BaseDirectory.AppLocalData,
       })
 
