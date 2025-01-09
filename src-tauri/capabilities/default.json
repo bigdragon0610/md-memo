@@ -9,6 +9,22 @@
     "opener:default",
     "fs:default",
     "fs:allow-app-read",
-    "fs:allow-app-write"
+    "fs:allow-app-write",
+    "shell:default",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "exec-sh",
+          "cmd": "sh",
+          "args": [
+            "-c",
+            {
+              "validator": ".*(http|https|file)://.*"
+            }
+          ]
+        }
+      ]
+    }
   ]
 }
