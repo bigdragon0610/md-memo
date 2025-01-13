@@ -108,20 +108,12 @@ function App() {
     if (
       e.metaKey &&
       e.target instanceof HTMLSpanElement &&
-      e.target.classList.contains('detected-link-active') &&
-      e.target.textContent
+      e.target.classList.contains('detected-link-active')
     ) {
       e.preventDefault()
-      if (!e.target.parentNode) return
-      const url = Array.from(e.target.parentNode.childNodes)
-        .map((node) => {
-          if (
-            node instanceof HTMLSpanElement &&
-            node.classList.contains('detected-link-active')
-          ) {
-            return node.textContent
-          }
-        })
+      const urlNodes = document.querySelectorAll('.detected-link-active')
+      const url = Array.from(urlNodes)
+        .map((node) => node.textContent)
         .join('')
       await Command.create('exec-sh', ['-c', `open ${url}`]).execute()
     }
