@@ -1,7 +1,12 @@
-# Tauri + React + Typescript
+# md-memo
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+## 開発
 
-## Recommended IDE Setup
+```sh
+npm run tauri dev
+```
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+## ビルド
+```sh
+npm run tauri build -- --bundles dmg
+```
